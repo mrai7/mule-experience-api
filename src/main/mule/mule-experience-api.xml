@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config"
+		doc:name="HTTP Listener config"
+		doc:id="2d52f571-6cf4-4d6e-a8b6-368b1b9eae77">
+		<http:listener-connection host="0.0.0.0"
+			port="8081" />
+	</http:listener-config>
+	<http:request-config name="Process_API_Config" doc:name="HTTP Request config">
+
+        <http:request-connection
+            host="localhost"
+            port="8082"/>
+
+    </http:request-config>
+	<flow name="mule-experience-apiFlow" doc:id="e1934991-a88a-4e41-bbcd-dd6433b89254" >
+		<http:listener doc:name="Listener" config-ref="HTTP_Listener_config" path="/api/upload">
+		<http:response statusCode="200">
+
+                <http:headers><![CDATA[
+#[
+{
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+    "Access-Control-Allow-Headers": "*"
+}
+]
+]]></http:headers>
+
+            </http:response>
+            </http:listener>
+		 <logger
+            level="INFO"
+            message="Received image upload request"/>
+		<http:request doc:name="Request" doc:id="3ac31ba9-0c6e-4719-b65f-591a79b23bfd" 
+			config-ref="Process_API_Config" 
+			method="POST" 
+			path="/process/classify"/>
+			
+			 <logger
+            level="INFO"
+            message="Response from Process API: #[payload]"/>
+	</flow>
+</mule>
